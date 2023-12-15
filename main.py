@@ -2,6 +2,9 @@ from selenium import webdriver as opcoes_selenium
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 import pyautogui as tempo_espera
+from openpyxl import load_workbook
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as ec
 
 """
     email = 164664499
@@ -12,16 +15,46 @@ import pyautogui as tempo_espera
     button submit = //*[@id="patas"]/main/article/section/form/div[2]/button
 """
 
-navegadorForm = opcoes_selenium.Chrome()
-navegadorForm.get("https://pt.surveymonkey.com/r/2LXVCXJ")
+caminho_arquivo ='dadis-form.xlsx'
+planilha_aberta = load_workbook(filename=caminho_arquivo)
+sheet_selecionada = planilha_aberta['Dados']
 
-navegadorForm.find_element(By.NAME, "164664468").send_keys('Lucas de Freitas Gonçalves Ribeiro')
-navegadorForm.find_element(By.NAME, "164664499").send_keys('lucasfreitasr@outlook.com')
-navegadorForm.find_element(By.NAME, "164664560").send_keys('(15) 99170-0089')
-navegadorForm.find_element(By.ID, "164665110_1204416430_label").click()
-navegadorForm.find_element(By.NAME, "164665180").send_keys('Eu amo Python')
-navegadorForm.find_element(By.XPATH, '//*[@id="patas"]/main/article/section/form/div[2]/button').click()
-navegadorForm.get("https://pt.surveymonkey.com/r/2LXVCXJ")
+for  linha in range(2,len(sheet_selecionada['A']) + 1):
+
+    nome = sheet_selecionada[f'A{linha}'].value
+    email = sheet_selecionada[f'B{linha}'].value
+    telefone = sheet_selecionada[f'C{linha}'].value
+    sexo = sheet_selecionada[f'D{linha}'].value
+    sobre = sheet_selecionada[f'E{linha}'].value
+
+
+    navegadorForm = opcoes_selenium.Chrome()
+    navegadorForm.get("https://pt.surveymonkey.com/r/2LXVCXJ")
+
+    espera = WebDriverWait(navegadorForm,10)
+
+    campo_nome = espera.until(ec.presence_of_element_located((By.ID, "164664468")))
+    campo_nome.send_keys(nome)
+
+    campo_email = espera.until(ec.presence_of_element_located((By.ID, "164664499")))
+    campo_email.send_keys(email)
+
+    campo_telefone = espera.until(ec.presence_of_element_located((By.ID, "164664560")))
+    campo_telefone.send_keys(telefone)
+
+    campo_sbore = espera.until(ec.presence_of_element_located((By.ID, "164665180")))
+    campo_sbore.send_keys(sobre)
+
+    if sexo == 'Masculino':
+        botao_masculino = espera.until(ec.element_to_be_clickable((By.ID, "164665110_1204416430_label")))
+        botao_masculino.click()
+    else:
+        botao_feminino = espera.until(ec.element_to_be_clickable((By.ID, "164665110_1204416431_label")))
+        botao_feminino.click()
+
+    botao_enviar = espera.until(ec.element_to_be_clickable((By.XPATH, '//*[@id="patas"]/main/article/section/form/div[2]/button')))
+
+    navegadorForm.get("https://pt.surveymonkey.com/r/2LXVCXJ")
 
 
 
