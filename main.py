@@ -5,18 +5,12 @@ from openpyxl import load_workbook
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
 
-"""
-    email = 164664499
-    telefone = 164664560
-    texto = 164665180
-    masculino = 164665110_1204416430_label
-    feminino = 164665110_1204416431_label]
-    button submit = //*[@id="patas"]/main/article/section/form/div[2]/button
-"""
+
 
 caminho_arquivo = 'dadis-form.xlsx'
 planilha_aberta = load_workbook(filename=caminho_arquivo)
 sheet_selecionada = planilha_aberta['Dados']
+navegadorForm = opcoes_selenium.Edge()
 
 for linha in range(2, len(sheet_selecionada['A']) + 1):
 
@@ -26,7 +20,10 @@ for linha in range(2, len(sheet_selecionada['A']) + 1):
     sexo = sheet_selecionada[f'D{linha}'].value
     sobre = sheet_selecionada[f'E{linha}'].value
 
-    navegadorForm = opcoes_selenium.Chrome()
+    if nome is None and email is None and telefone is None and sexo is None and sobre is None:
+        print(f"Fim dos dados na linha {linha}. Terminando a execução.")
+        break
+
     navegadorForm.get("https://pt.surveymonkey.com/r/2LXVCXJ")
 
     espera = WebDriverWait(navegadorForm, 10)
@@ -59,8 +56,8 @@ for linha in range(2, len(sheet_selecionada['A']) + 1):
     botao_enviar = espera.until(ec.element_to_be_clickable(
         (By.XPATH,
          '//*[@id="patas"]/main/article/section/form/div[2]/button')))
+    botao_enviar.click()
 
-    navegadorForm.get("https://pt.surveymonkey.com/r/2LXVCXJ")
+    navegadorForm.refresh()
 
-
-tempo_espera.sleep(40)
+navegadorForm.quit()
